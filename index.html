@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body{
+            width: 100%;
+            height: 100vh;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container{
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+            width: 25%;
+            align-items: center;
+        }
+
+        .text-container {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .div-container{
+            display: flex;
+            padding: 10px 15px;
+            width: 100%;
+            justify-content: space-around;    
+        }
+
+        h2{
+            color: #fff;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #fff;
+        }
+
+        .input{
+            padding: 5px 10px;
+            min-width: 14rem;
+            font-size: 15px;
+            border-radius: .5rem;
+            margin-right: 10px;
+            margin-bottom: 15px;
+        }
+
+        .btn{
+            background-color: rgb(243, 243, 117);
+            color: #000;
+            padding: 10px 15px;
+            border-radius: 25px;
+            border: 1px solid black;
+        }
+
+        .btn:hover{
+            background-color: #000;
+            color: #fff;
+            transition: ease-in-out .3s;
+            border: 1px solid rgb(243, 243, 117);
+        }
+
+        .deleteBtn{
+            background-color: rgb(243, 243, 117);
+            color: #000;
+            padding: 10px 15px;
+            border-radius: 25px;
+            border: 1px solid black;
+        }
+
+        .deleteBtn:hover{
+            background-color: #000;
+            color: #fff;
+            transition: ease-in-out .3s;
+            border: 1px solid rgb(243, 243, 117);
+        }
+
+        li{
+            text-align: left;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            padding-top: 5px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>ToDo List</h2>
+        <br/>
+        <form>
+            <div >
+                <input type="text" class="input" id="inputValue" autocomplete="off">
+                <button class="btn" id="todoBtn">Add ToDo</button>
+            </div>
+            <section class="text-container">
+            </section>
+        </form>
+    </div>
+
+    <script>
+        const mainSection = document.querySelector('.text-container');
+        const inputValue = document.getElementById('inputValue');
+
+        
+
+        const getTodoListFromLocal = () => {
+            return JSON.parse(localStorage.getItem("youtubeToDoList"))
+        }
+
+        const addTodoListLocalStorage = (localToDoList) => {
+            return localStorage.setItem("youtubeToDoList", JSON.stringify(localToDoList))
+        }
+
+        let localToDoList = getTodoListFromLocal() || [];
+
+        const addTodoDynamicEle = (currEle) => {
+            const divElem = document.createElement("div");
+            divElem.classList.add("div-container");
+            divElem.innerHTML = `<li>${currEle}</li><button class="deleteBtn">Delete</button>`;
+            mainSection.append(divElem);
+        }
+
+        const addToDoList = (e) => {
+            e.preventDefault();
+
+            const todoListValue = inputValue.value.trim();
+
+            inputValue.value = "";
+
+            if(todoListValue !== "" && !localToDoList.includes(todoListValue)){
+            localToDoList.push(todoListValue);
+            localToDoList = [...new Set(localToDoList)];
+            // console.log(localToDoList);
+            localStorage.setItem("youtubeToDoList", JSON.stringify(localToDoList))
+
+            addTodoDynamicEle(todoListValue);
+            }
+        }
+
+        const showTodoList = () => {
+            console.log(localToDoList);
+
+            localToDoList.forEach((currEle) => {
+                addTodoDynamicEle(currEle);
+            });
+        }
+
+        showTodoList();
+
+        const removeTodoEle = (e) => {
+            let todoToRemove = e.target;
+            let todoListContain = todoToRemove.previousElementSibling.innerText;
+            let parentElem = todoToRemove.parentElement;
+            console.log(todoListContain);
+
+            localToDoList = localToDoList.filter((currTodo) => {
+                return currTodo !== todoListContain.toLowerCase();
+            })
+
+            addTodoListLocalStorage(localToDoList);
+            parentElem.remove();
+            console.log(localToDoList);
+        }
+
+        mainSection.addEventListener('click', (e) => {
+            e.preventDefault();
+            // removeTodoEle(e);
+            if(e.target.classList.contains("deleteBtn")){
+                removeTodoEle(e);
+            }
+        })
+
+        document.querySelector('.btn').addEventListener('click', (e) => {
+            addToDoList(e);
+        })
+    </script>
+</body>
+</html>
